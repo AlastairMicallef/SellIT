@@ -29,13 +29,13 @@
 					]);
                 echo "</div>";
                 echo '<div class="col-4">';
+
+                echo $this->Form->input('Item_Image', ['type' => 'file']); 
+                echo "</div>";
+                echo '<div class="col-4">';
 					echo $this->Form->control("Item_public", array(
                     'type' => 'checkbox',
                     )) ;
-                echo "</div>";
-                echo '<div class="col-4">';
-
-                echo $this->Form->input('Item_Image', ['type' => 'file']); 
                 echo "</div>";
 					
 				
