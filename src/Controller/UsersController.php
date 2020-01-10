@@ -32,9 +32,10 @@ class UsersController extends AppController
 
     public function login()
     {
+        //$this->viewBuilder()->setLayout('login');
         if ($this->request->is('post')) {
             $user = $this->Auth->identify();
-            echo var_dump($user);
+            debug($user);
 
             if ($user) {
                 $this->Auth->setUser($user);
