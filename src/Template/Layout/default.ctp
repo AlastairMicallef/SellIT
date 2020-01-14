@@ -47,12 +47,16 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
       <li class="nav-item">
         <a class="nav-link" href="<?=$this->request->webroot?>items/add">Add Item</a>
       </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?=$this->request->webroot?>users/view">Users List</a>
+      </li>
       <li class="nav-item">
         <a class="nav-link" href="<?=$this->request->webroot?>users/login">Login</a>
       </li>
       <li class="nav-item">
          <a class="nav-item nav-link" href="<?=$this->request->webroot?>users/register">Register</a>
       </li>
+        
     </ul>
     <main class="main">
         <div class="container">

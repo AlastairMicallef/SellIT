@@ -3,6 +3,8 @@ namespace App\Controller;
 
 use Cake\Controller\Controller;
 use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
+
 
 class UsersController extends AppController
 {
@@ -31,23 +33,62 @@ class UsersController extends AppController
 
 
     public function login()
-    {
-        //$this->viewBuilder()->setLayout('login');
+    { //if user is already logged in, redirect!
+        if ($this->Auth->user('id'))return $this->redirect(['controller'=>'Items','action' => 'index']);
+        
         if ($this->request->is('post')) {
+            
             $user = $this->Auth->identify();
-            debug($user);
-
+    
             if ($user) {
                 $this->Auth->setUser($user);
-                return $this->redirect($this->Auth->redirectUrl());
+                $this->Flash->success('You are now logged in!');
+                return $this->redirect(['controller'=>'Items','action' => 'index']);
             }
-            
-            $this->Flash->error(__('Invalid email or password, try again'));
+            $this->Flash->error('Your username or password is incorrect.');
+            return $this->redirect(['Users' => 'Login']);
         }
     }
 
     public function logout()
     {
         return $this->redirect($this->Auth->logout());
+    }
+    
+     public function view()
+    {
+        $this->set('friends', TableRegistry::get("friends"));
+		$usersTable = TableRegistry::getTableLocator()->get('Users');
+
+		$usersTable = $this->Users;
+         
+		$query = $usersTable->find();
+		
+		$allUsers = $query->toArray();
+		
+		$this->set("users", $allUsers);
+          
+     }
+    
+   
+    
+    public function Adduser($user_id){
+        var_dump($user_id);
+        if ($this->request->is('post')) {
+            $addTable = TableRegistry::get("Friends");
+            $newfriend = $addTable->newEntity(['Friend_ID' => $this->Auth->user('id'), 'Friend_ID' => $user_id,'Friend_Request' => '34','Accepted' => '1']);
+            $addTable->save($newfriend);
+            
+            return $this->redirect($this->referer());
+        }
+    }
+    public function RemoveFriend($user_id){
+        var_dump($user_id);
+        if ($this->request->is('post')) {
+            $removeTable = TableRegistry::get("Friends");
+            $newFriend = $removeTable->get(['Friend_ID' => $this->Auth->user('id'), 'Friend_ID' => $user_id]);
+            $removeTable->delete($newFriend);
+            return $this->redirect($this->referer());
+        }
     }
 }
