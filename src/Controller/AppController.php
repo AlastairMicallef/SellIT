@@ -45,22 +45,28 @@ class AppController extends Controller
             'enableBeforeRedirect' => false,
         ]);
         $this->loadComponent('Flash');
-        $this->loadComponent('Auth', [
-            'loginRedirect' => [
-                'controller' => 'Users',
-                'action' => 'register'
-            ],
-            'logoutRedirect' => [
-                'controller' => 'Pages',
-                'action' => 'display',
-                'home'
-            ],
-            'authenticate'=>[
-                'Form'=>[
-                    'fields'=>['email'=>'email','password'=>'password']
+         $this->loadComponent('Auth', [
+            'authenticate' => [
+                'Form' => [
+                    'fields' => [
+                        'username' => 'email',
+                        'password' => 'password'
+                    ]
                 ]
-            ]
+            ],
+            'loginAction' => [
+                'controller' => 'Users',
+                'action' => 'login'
+            ],
+             // If unauthorized, return them to page they were just on
+            'unauthorizedRedirect' => $this->referer()
         ]);
+        
+        if($this->Auth->user('id')){
+            $this->set("login", true);
+            $this->set("user_id", $this->Auth->user('id'));
+            $this->set("user_role", $this->Auth->user('role'));
+        }
     }
         
         public function beforeFilter(Event $event)

@@ -4,6 +4,8 @@ namespace App\Controller;
 use Cake\Controller\Controller;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
+use Cake\Utility\Inflector;
+
 
 
 class UsersController extends AppController
@@ -17,17 +19,26 @@ class UsersController extends AppController
     
     public function register()
     {
-        $user = $this->Users->newEntity();
+         $usersTable = TableRegistry::get("Users");
+            
         if ($this->request->is('post')) {
-            // Prior to 3.4.0 $this->request->data() was used.
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
+
+            $newUser = $usersTable->newEntity($this->request->getData());
+            $newUser->slug = Inflector::slug($newUser->email);
+            if ($usersTable->save($newUser)) {
+                //$this->Flash->success("User saved!");
                 return $this->redirect(['action' => 'register']);
             }
-            $this->Flash->error(__('Unable to add the user.'));
+            
+            $errors = $newUser->errors();
+            $error_msg = '';
+            foreach ($errors as $error) {
+                $error_msg .= array_values($error)[0]."<br/>";
+            }
+            $this->Flash->error('Unable to add a new user.<hr/>'.$error_msg, ['escape' => false]);
         }
-        $this->set('user', $user);
+        
+        $this->set('user', $usersTable->newEntity());
     }
     
 
@@ -46,7 +57,7 @@ class UsersController extends AppController
                 return $this->redirect(['controller'=>'Items','action' => 'index']);
             }
             $this->Flash->error('Your username or password is incorrect.');
-            return $this->redirect(['Users' => 'Login']);
+            return $this->redirect(['action' => 'login']);
         }
     }
 
