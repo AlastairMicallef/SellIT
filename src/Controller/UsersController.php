@@ -5,6 +5,8 @@ use Cake\Controller\Controller;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
+use Cake\Log\Log;
+
 
 
 
@@ -54,8 +56,12 @@ class UsersController extends AppController
             if ($user) {
                 $this->Auth->setUser($user);
                 $this->Flash->success('You are now logged in!');
+                Log::warning("User Added by ".$this->Auth->user('first_name')." ".$this->Auth->user('last_name').", IP address:".$this->request->clientIp(), ['scope' => ['posts']]);
+
                 return $this->redirect(['controller'=>'Items','action' => 'index']);
             }
+                Log::warning("User unsuccesfully not log in by, IP address:".$this->request->clientIp(), ['scope' => ['posts']]);
+
             $this->Flash->error('Your username or password is incorrect.');
             return $this->redirect(['action' => 'login']);
         }
@@ -63,6 +69,7 @@ class UsersController extends AppController
 
     public function logout()
     {
+        Log::warning("Succesfully logged out ".$this->Auth->user('first_name')." ".$this->Auth->user('last_name').", IP address:".$this->request->clientIp(), ['scope' => ['posts']]);
         return $this->redirect($this->Auth->logout());
     }
     
@@ -87,7 +94,7 @@ class UsersController extends AppController
         var_dump($user_id);
         if ($this->request->is('post')) {
             $addTable = TableRegistry::get("Friends");
-            $newfriend = $addTable->newEntity(['Friend_ID' => $this->Auth->user('id'), 'Friend_ID' => $user_id,'Friend_Request' => '34','Accepted' => '1']);
+            $newfriend = $addTable->newEntity(['Friend_ID' => $this->Auth->user('id'), 'Friend_ID' => $user_id,'Friend_Request' => $user_id ,'Accepted' => '1']);
             $addTable->save($newfriend);
             
             return $this->redirect($this->referer());

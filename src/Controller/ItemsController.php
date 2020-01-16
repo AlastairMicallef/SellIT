@@ -55,14 +55,12 @@ class ItemsController extends AppController
     
         }
         public function add() {
-            if ($this->request->is('post')) {
+           if ($this->request->is('post')) {
             
-            $itemsTable = TableRegistry::get("Items");
-            $items = $itemsTableTable->newEntity($this->request->getData());
-            $items->user_id = $this->Auth->user('id');
-            $post->slug = time().Inflector::slug($post->post_content);
+            $itemsTable = TableRegistry::get("Friends");
+            $item = $itemsTable->newEntity($this->request->getData());
+            $item->user_id = $this->Auth->user('id');
             
-                var_dump($items);
             if(!empty($this->request->getData('uploadedPhoto')['name'])){
                 $imgFileType = strtolower(pathinfo($this->request->getData('uploadedPhoto')['name'], PATHINFO_EXTENSION));
                 
@@ -74,14 +72,28 @@ class ItemsController extends AppController
                     $target_filePath = 'UploadedPhotos/'.time().$this->request->getData('uploadedPhoto')['name'];
 
                     if(move_uploaded_file($this->request->getData('uploadedPhoto')['tmp_name'], WWW_ROOT.$target_filePath)){
-                        $items->Item_Image = $target_filePath;
+                        $post->Item_Image = $target_filePath;
                     }else{
                         $this->Flash->error("Your file was not uploaded.");
-                        Log::warning("File was not uploaded. Upload tried by ".$this->Auth->user('first_name')." ".$this->Auth->user('last_name').", IP address:".$this->request->clientIp(), ['scope' => ['items']]);
+                        Log::warning("File was not uploaded. Upload tried by ".$this->Auth->user('first_name')." ".$this->Auth->user('last_name').", IP address:".$this->request->clientIp(), ['scope' => ['posts']]);
                     }
                 }
             }
+            
+            if ($itemsTable->save($post)) {
+                $this->Flash->success("Item added!");
+                Log::info("Post Uploaded by ".$this->Auth->user('first_name')." ".$this->Auth->user('last_name').", IP address:".$this->request->clientIp(), ['scope' => ['posts']]);
+                return $this->redirect(['action' => 'index']);
             }
+            
+            $errors = $itemsTable->errors();
+            $error_msg = '';
+            foreach ($errors as $error) {
+                $error_msg .= array_values($error)[0]."<br/>";
+            }
+            $this->Flash->error('Unable to add a new item.<hr/>'.$error_msg, ['escape' => false]);
+            Log::warning("A new item couldn't be created. Upload Post tried by ".$this->Auth->user('first_name')." ".$this->Auth->user('last_name').", IP address:".$this->request->clientIp(), ['scope' => ['posts']]);
+        }
   
 }
 }

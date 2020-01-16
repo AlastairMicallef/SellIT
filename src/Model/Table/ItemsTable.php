@@ -13,16 +13,7 @@ class UsersTable extends Table
 
        
 
-        $this->addBehavior('SellIT/Upload.Upload', [
-            'photo' => [
-                'fields' => [
-                   
-                    'dir' => 'photo_dir', 
- 
-                ],
-            ],
-        ]);
-    }
+}
 }
 ?>
 <?php
